@@ -1,6 +1,5 @@
 const {
   GraphQLObjectType,
-  GraphQLString,
   GraphQLInt,
   GraphQLSchema,
   GraphQLNonNull,
@@ -9,10 +8,9 @@ const {
   GraphQLBoolean,
 } = require('graphql');
 
-const { GraphQLDate, GraphQLTime, GraphQLDateTime } = require('graphql-iso-date');
+const { GraphQLDateTime } = require('graphql-iso-date');
 
 const { Op } = require('sequelize');
-const moment = require('moment');
 
 const model = require('../database/models');
 
