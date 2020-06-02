@@ -1,6 +1,6 @@
 {
   "name": "node-graphql-results",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Express/Graphql App for retrieving sensor data from Postgres DB",
   "main": "app.js",
   "scripts": {
