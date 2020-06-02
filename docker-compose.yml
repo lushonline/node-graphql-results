@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  node-graphql-results:
+    image: node-graphql-results
+    build: .
+    environment:
+      NODE_ENV: production
+    ports:
+      - ${PORT}:4000
