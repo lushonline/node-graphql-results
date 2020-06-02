@@ -3,6 +3,7 @@ version: '3.4'
 services:
   node-graphql-results:
     image: node-graphql-results
+    restart: always
     build: .
     environment:
       NODE_ENV: production
