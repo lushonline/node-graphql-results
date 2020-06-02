@@ -91,7 +91,7 @@ const RootQuery = new GraphQLObjectType({
           edges,
           pageInfo: {
             hasNextPage,
-            endCursor: edges.length > 1 ? edges[edges.length - 1].createdAt : null,
+            endCursor: edges.length !== 0 ? edges[edges.length - 1].createdAt : null,
           },
         };
       },
