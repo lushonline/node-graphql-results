@@ -7,5 +7,7 @@ services:
     build: .
     environment:
       NODE_ENV: production
+      DATABASE_URL: postgres://dbuser:dbpassword@pi4.lushonline.local:5432/rawdata?connect_timeout=5
+      PORT: 4000
     ports:
       - ${PORT}:4000
