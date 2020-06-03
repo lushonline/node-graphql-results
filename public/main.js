@@ -1,11 +1,13 @@
 const app = new Vue({
-  el: '#app',
+  el: "#app",
   data: {
     chart: null,
     dates: [],
     temps: [],
+    pressures: [],
     loading: false,
     errored: false,
+    hoursback: 24,
   },
   mounted() {
     this.loading = true;
@@ -14,112 +16,153 @@ const app = new Vue({
       this.chart.destroy();
     }
 
-    const cursor = moment().subtract(6, 'hours').format();
+    const cursor = moment().subtract(this.hoursback, "hours").format();
 
-    const query = `
-    {
-      results(cursor: "${cursor}") {
-        edges {
-          id,
-          createdAt,
-          temperature,
-          pressure
+    const getData = async function (cursor) {
+      return new Promise(async function (resolve, reject) {
+        let cursorToUse = cursor;
+        const axiosConfig = {
+          url: "graphql",
+          method: "post",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        };
+
+        let edges = [];
+        let keepGoing = true;
+
+        while (keepGoing) {
+          const query = `{results(cursor: "${cursorToUse}") {edges {createdAt,temperature,pressure} pageInfo {endCursor, hasNextPage}}}`;
+
+          const variables = {};
+          const requestBody = { query, variables };
+
+          axiosConfig.data = { query, variables };
+
+          try {
+            const response = await axios.request(axiosConfig);
+            const results = response.data.data.results;
+
+            edges = [...edges, ...results.edges];
+
+            if (!results.pageInfo.hasNextPage) {
+              keepGoing = false;
+            }
+            cursorToUse = results.pageInfo.endCursor;
+          } catch (error) {
+            reject(error);
+          }
         }
-        pageInfo {
-          endCursor,
-          hasNextPage
-        }
-      }
-    }
-  `;
-
-    const variables = {};
-
-    const requestBody = { query, variables };
-
-    const axiosConfig = {
-      url: 'graphql',
-      method: 'post',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      data: requestBody,
+        resolve(edges);
+      });
     };
 
-    axios
-      .request(axiosConfig)
-      .then((response) => {
-        this.dates = response.data.results.edges.map((edges) => {
-          return edges.createdAt;
+    getData(cursor)
+      .then((edges) => {
+        this.dates = edges.map((edge) => {
+          return edge.createdAt;
         });
 
-        this.temps = response.data.results.edges.map((edges) => {
-          return edges.temperature;
+        this.temps = edges.map((edge) => {
+          return edge.temperature;
         });
 
-        const ctx = document.getElementById('myChart');
+        this.pressures = edges.map((edge) => {
+          return edge.pressure / 100;
+        });
+
+        const ctx = document.getElementById("myChart");
         this.chart = new Chart(ctx, {
-          type: 'line',
+          type: "line",
           data: {
             labels: this.dates,
             datasets: [
               {
-                label: 'Temperature',
-                backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                borderColor: 'rgb(54, 162, 235)',
+                label: "Temperature",
+                units: "°C",
+                backgroundColor: "rgba(54, 162, 235, 0.5)",
+                borderColor: "rgb(54, 162, 235)",
                 fill: false,
                 data: this.temps,
+                yAxisID: "temperature-axis",
+              },
+              {
+                label: "Pressure",
+                units: "hPa",
+                backgroundColor: "rgba(235, 127, 54, 0.5)",
+                borderColor: "rgb(235, 127, 54)",
+                fill: false,
+                data: this.pressures,
+                yAxisID: "pressure-axis",
               },
             ],
           },
           options: {
             title: {
               display: true,
-              text: 'Temperature',
+              text: "Temperature & Pressure",
             },
             tooltips: {
               callbacks: {
                 label(tooltipItem, data) {
-                  let label = data.datasets[tooltipItem.datasetIndex].label || '';
-
+                  let label =
+                    data.datasets[tooltipItem.datasetIndex].label || "";
+                  let units =
+                    data.datasets[tooltipItem.datasetIndex].units || "";
                   if (label) {
-                    label += ': ';
+                    label += ": ";
                   }
 
                   label += Math.floor(tooltipItem.yLabel);
-                  return `${label}°C`;
+                  return `${label}${units}`;
                 },
               },
             },
             scales: {
               xAxes: [
                 {
-                  type: 'time',
+                  type: "time",
                   time: {
-                    unit: 'hour',
+                    unit: "hour",
                     displayFormats: {
-                      hour: 'LLLL',
+                      hour: "ddd HH:mm:ss",
                     },
-                    tooltipFormat: 'LLLL',
+                    tooltipFormat: "LLLL",
                   },
                   scaleLabel: {
                     display: true,
-                    labelString: 'Date/Time',
+                    labelString: "Date/Time",
                   },
                 },
               ],
               yAxes: [
                 {
+                  position: "left",
                   scaleLabel: {
                     display: true,
-                    labelString: 'Temperature (°C)',
+                    labelString: "Temperature (°C)",
                   },
                   ticks: {
                     callback(value, index, values) {
                       return `${value}°C`;
                     },
                   },
+                  id: "temperature-axis",
+                },
+                {
+                  position: "right",
+                  scaleLabel: {
+                    display: true,
+                    labelString: "Pressure (hPa)",
+                  },
+                  ticks: {
+                    callback(value, index, values) {
+                      return `${value} hPa`;
+                    },
+                  },
+                  id: "pressure-axis",
                 },
               ],
             },

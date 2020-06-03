@@ -2,6 +2,7 @@ version: '3.4'
 
 services:
   node-graphql-results:
+    container_name: graphql_rpi
     image: node-graphql-results
     restart: always
     build: .
