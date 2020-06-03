@@ -59,10 +59,10 @@ const RootQuery = new GraphQLObjectType({
         'Returns paged results using cursor based pagination, maximum records per request is 50',
       args: {
         cursor: { type: GraphQLDateTime, defaultValue: null },
-        limit: { type: GraphQLInt, defaultValue: 5 },
+        limit: { type: GraphQLInt, defaultValue: 500 },
       },
       // eslint-disable-next-line no-unused-vars
-      async resolve(parent, { cursor, limit = 5 }) {
+      async resolve(parent, { cursor, limit = 500 }) {
         const cursorOptions = cursor
           ? {
               where: {
@@ -73,9 +73,9 @@ const RootQuery = new GraphQLObjectType({
             }
           : {};
 
-        // Limit "limit" to 50
-        if (limit > 50) {
-          throw new Error('Maximum limit is 50');
+        // Limit "limit" to 500
+        if (limit > 500) {
+          throw new Error('Maximum limit is 500');
         }
 
         const resultItems = await results.findAll({
