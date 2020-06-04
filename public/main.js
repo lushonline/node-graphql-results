@@ -39,7 +39,14 @@ function renderChart(ctx, data) {
             }
 
             label += Math.floor(tooltipItem.yLabel);
-            return `${label}${units}`;
+            let current = `${label}${units}`;
+            let min = `Min: ${Math.floor(
+              data.datasets[tooltipItem.datasetIndex].stats.min
+            )}${units}`;
+            let max = `Max: ${Math.floor(
+              data.datasets[tooltipItem.datasetIndex].stats.max
+            )}${units}`;
+            return `${current} ${min} ${max}`;
           },
         },
       },
@@ -119,10 +126,38 @@ function renderChart(ctx, data) {
             threshold: 10,
           },
         },
+        mystatsplugin: {},
       },
     },
   });
 }
+
+var mystatsplugin = {
+  id: 'mystats',
+
+  beforeUpdate: function (chart) {
+    var x = 1;
+  },
+
+  afterDatasetUpdate: function (chart, args, options) {
+    var datasetIndex = args.index;
+    var dataset = chart.data.datasets[datasetIndex];
+    dataset.stats = {
+      min: null,
+      max: null,
+      average: null,
+    };
+    if (dataset.data.length > 0) {
+      dataset.stats.min = Math.min.apply(null, dataset.data);
+      dataset.stats.max = Math.max.apply(null, dataset.data);
+      dataset.stats.average =
+        dataset.data.reduce(function (a, b) {
+          return a + b;
+        }, 0) / dataset.data.length;
+    }
+  },
+};
+Chart.plugins.register(mystatsplugin);
 
 async function getData(graphql = 'graphql', cursor) {
   return new Promise(async function (resolve, reject) {
@@ -209,6 +244,7 @@ $(function () {
           chart.data.labels = data.date;
           chart.data.datasets[0].data = data.temperature;
           chart.data.datasets[1].data = data.pressure;
+
           chart.update();
           $('#controls').removeClass('d-none');
         }
