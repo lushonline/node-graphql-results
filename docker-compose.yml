@@ -4,22 +4,40 @@ services:
   db:
     container_name: graphql_rpi_db_v2
     image: postgres
+    env_file:
+      - .env
     environment:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
       - POSTGRES_DB
+      - POSTGRES_HOST
+      - POSTGRES_PORT
+      - PGDATA
     ports:
-      - '5432:5432'
-  node-graphql-results:
+      - ${POSTGRES_PORT}:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  graphql:
     container_name: graphql_rpi_v2
     image: node-graphql-results
     build: .
+    env_file:
+      - .env
     environment:
       - WAIT_HOSTS=db:5432
       - NODE_ENV
-      - DATABASE_URL
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+      - POSTGRES_HOST
+      - POSTGRES_PORT
+      - PGDATA
       - PORT
     ports:
       - ${PORT}:4000
     depends_on:
       - db
+volumes: 
+  pgdata:
+      name: ${PGDATA}
+      external: true

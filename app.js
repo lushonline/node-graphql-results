@@ -19,13 +19,14 @@ app.use(
 );
 
 const PORT = process.env.PORT || 4000;
-const DATABASE_URL = process.env.DATABASE_URL || '';
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
-  console.log(`Now app is running on port ${PORT}`);
+  console.log(`GraphQL app is running on port http://localhost:${PORT}/graphql`);
   // eslint-disable-next-line no-console
-  console.log(`Database Connection String: ${DATABASE_URL}`);
+  console.log(`Database Host: ${process.env.POSTGRES_HOST}:${process.env.POSTGRES_PORT}`);
+  // eslint-disable-next-line no-console
+  console.log(`Database Name: ${process.env.POSTGRES_DB}`);
 });
 
 module.exports = {
