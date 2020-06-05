@@ -1,14 +1,25 @@
 version: '3.4'
 
 services:
+  db:
+    container_name: graphql_rpi_db_v2
+    image: postgres
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+    ports:
+      - '5432:5432'
   node-graphql-results:
-    container_name: graphql_rpi
+    container_name: graphql_rpi_v2
     image: node-graphql-results
-    restart: always
     build: .
     environment:
-      NODE_ENV: production
-      DATABASE_URL: postgres://dbuser:dbpassword@pi4.lushonline.local:5432/rawdata?connect_timeout=5
-      PORT: 4000
+      - WAIT_HOSTS=db:5432
+      - NODE_ENV
+      - DATABASE_URL
+      - PORT
     ports:
       - ${PORT}:4000
+    depends_on:
+      - db
