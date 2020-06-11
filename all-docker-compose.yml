@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   db:
-    container_name: graphql_db
+    container_name: graphql_rpi_db_v2
     image: postgres
     env_file:
       - .env
@@ -18,7 +18,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
   graphql:
-    container_name: graphql
+    container_name: graphql_rpi_v2
     image: node-graphql-results
     build: .
     env_file:
@@ -36,6 +36,17 @@ services:
       - PORT
     ports:
       - ${PORT}:4000
+    depends_on:
+      - db
+  pgadmin4:
+    container_name: graphql_rpi_pgadmin_v2
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: 'dbuser@localhost.com'
+      PGADMIN_DEFAULT_PASSWORD: '1q2w34r5t'
+      PGADMIN_LISTEN_PORT: '5050'
+    ports:
+      - 5050:5050
     depends_on:
       - db
 volumes:
