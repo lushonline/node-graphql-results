@@ -1,22 +1,6 @@
 version: '3.4'
 
 services:
-  db:
-    container_name: graphql_rpi_db_v2
-    image: postgres
-    env_file:
-      - .env
-    environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
-      - POSTGRES_HOST
-      - POSTGRES_PORT
-      - PGDATA
-    ports:
-      - ${POSTGRES_PORT}:5432
-    volumes:
-      - pgdata:/var/lib/postgresql/data
   graphql:
     container_name: graphql_rpi_v2
     image: node-graphql-results
@@ -36,8 +20,3 @@ services:
       - PORT
     ports:
       - ${PORT}:4000
-    depends_on:
-      - db
-volumes:
-  pgdata:
-
