@@ -8,6 +8,8 @@ const {
   GraphQLBoolean,
 } = require('graphql');
 
+const GraphQLUUID = require('graphql-type-uuid');
+
 const { GraphQLDateTime } = require('graphql-iso-date');
 
 const { Op } = require('sequelize');
@@ -19,7 +21,7 @@ const { results } = model;
 const resultType = new GraphQLObjectType({
   name: 'result',
   fields: () => ({
-    id: { type: GraphQLInt },
+    id: { type: GraphQLUUID },
     temperature: { type: GraphQLFloat },
     pressure: { type: GraphQLFloat },
     createdAt: { type: GraphQLDateTime },
@@ -47,9 +49,11 @@ const RootQuery = new GraphQLObjectType({
   fields: {
     result: {
       type: resultType,
-      args: { id: { type: GraphQLInt } },
+      args: { id: { type: GraphQLUUID } },
       resolve(parent, args) {
-        return results.findByPk(args.id);
+        return results.findOne({
+          id: args.id,
+        });
       },
     },
 
