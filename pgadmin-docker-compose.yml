@@ -8,5 +8,6 @@ services:
       PGADMIN_DEFAULT_EMAIL: 'dbuser@localhost.com'
       PGADMIN_DEFAULT_PASSWORD: '1q2w34r5t'
       PGADMIN_LISTEN_PORT: '5050'
+      GUNICORN_ACCESS_LOGFILE: '/var/lib/pgadmin/gunicorn.log'
     ports:
       - 5050:5050

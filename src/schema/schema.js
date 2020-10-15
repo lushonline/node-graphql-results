@@ -111,11 +111,14 @@ const Mutation = new GraphQLObjectType({
       args: {
         temperature: { type: new GraphQLNonNull(GraphQLFloat) },
         pressure: { type: new GraphQLNonNull(GraphQLFloat) },
+        createdAt: { type: GraphQLDateTime },
       },
       resolve(parent, args) {
         const result = {
           temperature: args.temperature,
           pressure: args.pressure,
+          createdAt: args.createdAt,
+          updatedAt: args.createdAt,
         };
         return results.create(result);
       },
