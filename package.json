@@ -37,7 +37,7 @@
     "graphql-iso-date": "^3.6.1",
     "graphql-type-uuid": "^0.2.0",
     "lodash": "^4.17.15",
-    "moment": "^2.26.0",
+    "moment": "^2.29.4",
     "papaparse": "^5.2.0",
     "pg": "^8.2.1",
     "pg-hstore": "^2.3.3",
